@@ -1,0 +1,16 @@
+{
+  "name": "codex-codecheck",
+  "version": "1.0.0",
+  "description": "AI-powered code review using OpenAI o3-mini. Finds security issues, performance bottlenecks, and code quality problems. Supports single files, multi-file cross-reference analysis, and dedicated security/optimization audits.",
+  "author": "DRS-CodeMaster",
+  "homepage": "https://github.com/DRS-CodeMaster/codex-codecheck",
+  "tags": ["code-review", "security", "performance", "openai", "o3-mini"],
+  "skills": ["skills/codecheck.md"],
+  "commands": [
+    "commands/review.md",
+    "commands/multi.md",
+    "commands/security.md",
+    "commands/optimize.md",
+    "commands/setup.md"
+  ]
+}
