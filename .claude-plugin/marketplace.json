@@ -13,7 +13,7 @@
   "plugins": [
     {
       "name": "codex-codecheck",
-      "description": "AI-powered code review using OpenAI o3-mini. Security audits, performance optimization, cross-file analysis.",
+      "description": "Free & open source AI code review — no subscription required. Combines Claude with OpenAI o3-mini for deep reasoning analysis. Security audits, performance optimization, cross-file analysis. Typical cost: $0.01-0.03 per review (your own API key).",
       "version": "1.0.0",
       "author": {
         "name": "DRS-CodeMaster",
