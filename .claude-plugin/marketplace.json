@@ -1,14 +1,29 @@
 {
   "name": "codex-codecheck-marketplace",
   "description": "AI-powered code review plugins by DRS-CodeMaster",
-  "author": "DRS-CodeMaster",
+  "owner": {
+    "name": "DRS-CodeMaster",
+    "email": "support@meinezeit.live"
+  },
   "homepage": "https://github.com/DRS-CodeMaster/codex-codecheck",
+  "metadata": {
+    "description": "Two AI powerhouses reviewing your code: Claude orchestrates, OpenAI o3-mini analyzes.",
+    "version": "1.0.0"
+  },
   "plugins": [
     {
       "name": "codex-codecheck",
       "description": "AI-powered code review using OpenAI o3-mini. Security audits, performance optimization, cross-file analysis.",
       "version": "1.0.0",
-      "author": "DRS-CodeMaster",
+      "author": {
+        "name": "DRS-CodeMaster",
+        "email": "support@meinezeit.live"
+      },
+      "homepage": "https://github.com/DRS-CodeMaster/codex-codecheck",
+      "repository": "https://github.com/DRS-CodeMaster/codex-codecheck",
+      "license": "MIT",
+      "keywords": ["code-review", "openai", "o3-mini", "security-audit", "performance", "php", "javascript", "python", "dual-ai", "free"],
+      "category": "code-quality",
       "tags": ["code-review", "security", "performance", "openai", "o3-mini"],
       "source": "."
     }
