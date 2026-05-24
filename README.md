@@ -2,11 +2,11 @@
 
 **Free & open source** — no subscription required. Uses your own OpenAI API key. Typical cost: **$0.01–0.03 per review**.
 
-AI-powered code review plugin that combines Claude's orchestration with OpenAI o3-mini's deep reasoning. Two AI powerhouses reviewing your code together.
+AI-powered code review plugin that combines Claude's orchestration with OpenAI gpt-5.3-codex's deep reasoning. Two AI powerhouses reviewing your code together.
 
 ## What it does
 
-Codex-CodeCheck analyzes your source code for security vulnerabilities, performance bottlenecks, and code quality issues. Claude reads and understands your codebase, then sends it to OpenAI's o3-mini model for an independent, autonomous analysis. Results are returned as structured findings with severity ratings and fix suggestions — directly in your chat.
+Codex-CodeCheck analyzes your source code for security vulnerabilities, performance bottlenecks, and code quality issues. Claude reads and understands your codebase, then sends it to OpenAI's gpt-5.3-codex model for an independent, autonomous analysis. Results are returned as structured findings with severity ratings and fix suggestions — directly in your chat.
 
 ## Commands
 
@@ -26,7 +26,7 @@ Codex-CodeCheck analyzes your source code for security vulnerabilities, performa
 
 ## Requirements
 
-- OpenAI API key with access to o3-mini model
+- OpenAI API key with access to gpt-5.3-codex model
 - Python 3 installed on your machine
 
 ## Supported Languages
