@@ -62,7 +62,7 @@ Same format as /codex:review but with CWE references:
 
 ```
 ## Security Audit: <filename>
-Model: o3-mini | Reasoning: high
+Model: gpt-5.3-codex | Reasoning: high
 
 [CRITICAL] Line XX: Description (CWE-89)
   Fix: Suggestion

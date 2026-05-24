@@ -32,12 +32,12 @@ Review multiple files together with cross-file dependency analysis.
    === FILE: path/to/file2.php ===
    <content>
 4. Write /tmp/codex_review.py with:
-   - model: o3-mini
+   - model: gpt-5.3-codex
    - reasoning_effort: high (always for multi-file)
    - max_completion_tokens: 32000
    - developer prompt: cross-file review expert
    - user prompt: all files + focus
-5. Execute: python3 /tmp/codex_review.py (timeout_ms: 180000)
+5. Execute: python3 /tmp/codex_review.py (timeout_ms: 120000)
 6. Parse JSON and present findings grouped by file, then cross-file issues
 
 ## Developer Prompt

@@ -1,30 +1,21 @@
 {
   "name": "codex-codecheck-marketplace",
   "description": "AI-powered code review plugins by DRS-CodeMaster",
-  "owner": {
-    "name": "DRS-CodeMaster",
-    "email": "support@meinezeit.live"
-  },
+  "author": "DRS-CodeMaster",
   "homepage": "https://github.com/DRS-CodeMaster/codex-codecheck",
-  "metadata": {
-    "description": "Two AI powerhouses reviewing your code: Claude orchestrates, OpenAI o3-mini analyzes.",
-    "version": "1.0.0"
-  },
   "plugins": [
     {
       "name": "codex-codecheck",
-      "description": "Free & open source AI code review — no subscription required. Combines Claude with OpenAI o3-mini for deep reasoning analysis. Security audits, performance optimization, cross-file analysis. Typical cost: $0.01-0.03 per review (your own API key).",
-      "version": "1.0.0",
-      "author": {
-        "name": "DRS-CodeMaster",
-        "email": "support@meinezeit.live"
-      },
-      "homepage": "https://github.com/DRS-CodeMaster/codex-codecheck",
-      "repository": "https://github.com/DRS-CodeMaster/codex-codecheck",
-      "license": "MIT",
-      "keywords": ["code-review", "openai", "o3-mini", "security-audit", "performance", "php", "javascript", "python", "dual-ai", "free"],
-      "category": "code-quality",
-      "tags": ["code-review", "security", "performance", "openai", "o3-mini"],
+      "description": "Free & open source AI code review \u2014 no subscription required. Combines Claude with OpenAI o3-mini for deep reasoning analysis. Security audits, performance optimization, cross-file analysis. Typical cost: $0.01-0.03 per review (your own API key).",
+      "version": "2.2.0",
+      "author": "DRS-CodeMaster",
+      "tags": [
+        "code-review",
+        "security",
+        "performance",
+        "openai",
+        "gpt-5.3-codex"
+      ],
       "source": "."
     }
   ]

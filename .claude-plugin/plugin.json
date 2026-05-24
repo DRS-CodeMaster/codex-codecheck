@@ -1,11 +1,19 @@
 {
   "name": "codex-codecheck",
-  "version": "1.0.0",
-  "description": "Free & open source AI code review — no subscription required. Combines Claude with OpenAI o3-mini for deep reasoning analysis. Security audits, performance optimization, cross-file analysis. Typical cost: $0.01-0.03 per review (your own API key).",
+  "version": "2.2.0",
+  "description": "Free & open source AI code review \u2014 no subscription required. Combines Claude with OpenAI o3-mini for deep reasoning analysis. Security audits, performance optimization, cross-file analysis. Typical cost: $0.01-0.03 per review (your own API key).",
   "author": "DRS-CodeMaster",
   "homepage": "https://github.com/DRS-CodeMaster/codex-codecheck",
-  "tags": ["code-review", "security", "performance", "openai", "o3-mini"],
-  "skills": ["skills/codecheck.md"],
+  "tags": [
+    "code-review",
+    "security",
+    "performance",
+    "openai",
+    "gpt-5.3-codex"
+  ],
+  "skills": [
+    "skills/codecheck.md"
+  ],
   "commands": [
     "commands/review.md",
     "commands/multi.md",

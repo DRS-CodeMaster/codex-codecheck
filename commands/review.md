@@ -25,15 +25,15 @@ Review a single source code file for security, performance, and quality issues.
 
 1. Check config exists (~/.codex-codecheck/config.json) — if not, run /codex:setup
 2. Read the file and count lines
-3. If 1000+ lines: automatically switch to large-file mode (reasoning_effort: high)
+3. If 1000+ lines: switch to o4-mini with reasoning_effort: high
 4. Save file content to /tmp/codex_input.txt
 5. Write /tmp/codex_review.py with:
-   - model: o3-mini
+   - model: o4-mini
    - reasoning_effort: medium (or high for 1000+ lines)
    - max_completion_tokens: 16000 (or 32000 for large files)
    - developer prompt: code review expert, JSON-only response
    - user prompt: file path + focus + code content
-6. Execute: python3 /tmp/codex_review.py (timeout_ms: 120000 or 180000)
+6. Execute: python3 /tmp/codex_review.py (timeout_ms: 60000 or 180000)
 7. Parse JSON and present findings sorted by severity
 
 ## Developer Prompt
