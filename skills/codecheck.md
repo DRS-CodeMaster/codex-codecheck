@@ -1,11 +1,11 @@
 # Codex-CodeCheck Skill
 
-AI-powered code review using OpenAI gpt-5.3-codex model family.
+AI-powered code review using OpenAI gpt-5.6-sol model family.
 Analyzes code for security vulnerabilities, performance issues, and quality problems.
 
 ## Overview
 
-Codex-CodeCheck sends source code files to OpenAI o4-mini (single file) or gpt-5.3-codex (multi-file/deep analysis) for autonomous analysis.
+Codex-CodeCheck sends source code files to OpenAI gpt-5.6-sol for autonomous analysis; the reasoning effort scales with the job (low / medium / high).
 The model returns structured findings (severity, line number, description, fix suggestion)
 which are presented directly in the chat.
 
@@ -22,7 +22,7 @@ PHP, JavaScript, TypeScript, Python, HTML, CSS, JSON, XML, SQL, Markdown, YAML, 
 ## How It Works
 
 1. Read the source file(s) from disk
-2. Send to OpenAI o4-mini (single) or gpt-5.3-codex (multi) via Chat Completions API
+2. Send to OpenAI gpt-5.6-sol via the Responses API
 3. Parse JSON response with findings
 4. Present findings sorted by severity in chat
 
@@ -30,9 +30,9 @@ PHP, JavaScript, TypeScript, Python, HTML, CSS, JSON, XML, SQL, Markdown, YAML, 
 
 | Condition | Mode | reasoning_effort | max_tokens | timeout |
 |-----------|------|-----------------|------------|---------|
-| 1 file, under 1000 lines | o4-mini | medium | 16000 | 60s |
-| 1 file, 1000+ lines | o4-mini | high | 32000 | 120s |
-| 2+ files | gpt-5.3-codex | high | 32000 | 180s |
+| 1 file, under 1000 lines | gpt-5.6-sol | medium | 16000 | 60s |
+| 1 file, 1000+ lines | gpt-5.6-sol | high | 32000 | 120s |
+| 2+ files | gpt-5.6-sol | high | 32000 | 180s |
 
 Claude determines the mode automatically based on file count and line count.
 The user does not need to specify the mode.
@@ -44,7 +44,12 @@ Located at: ~/.codex-codecheck/config.json
 ```json
 {
   "openai_api_key": "sk-proj-...",
-  "model": "o4-mini",
+  "model": "gpt-5.6-sol",
+  "model_effort": "medium",
+  "multi_model": "gpt-5.6-sol",
+  "multi_effort": "high",
+  "mini_model": "gpt-5.6-sol",
+  "mini_effort": "low",
   "default_focus": "Security, Performance, Code Quality, Best Practices"
 }
 ```
@@ -101,7 +106,7 @@ Multi-file adds a "datei" field per finding:
 Single file:
 ```
 ## CodeCheck: <filename> (<lines> lines)
-Model: gpt-5.3-codex / gpt-5.3-codex | Reasoning: medium/high | Focus: <focus>
+Model: gpt-5.6-sol / gpt-5.6-sol | Reasoning: medium/high | Focus: <focus>
 
 [CRITICAL] Line XX: Description
   Fix: Suggestion
@@ -130,5 +135,5 @@ Multi-file groups findings by file and adds a Cross-File Issues section.
 4. timeout_ms: 60000 (single file) / 180000 (multi-file or large file)
 5. Findings sorted by severity: critical -> warning -> info
 6. File content always via /tmp/codex_input.txt — never inline in Python strings
-7. o4-mini uses reasoning_effort: medium (default) or high (1000+ lines)
-8. Multi-file/security/optimize always use gpt-5.3-codex with reasoning_effort: high
+7. Single file uses effort medium (default) or high (1000+ lines)
+8. Multi-file/security/optimize always use effort high

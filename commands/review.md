@@ -25,10 +25,10 @@ Review a single source code file for security, performance, and quality issues.
 
 1. Check config exists (~/.codex-codecheck/config.json) — if not, run /codex:setup
 2. Read the file and count lines
-3. If 1000+ lines: switch to o4-mini with reasoning_effort: high
+3. If 1000+ lines: keep gpt-5.6-sol, raise reasoning effort to high
 4. Save file content to /tmp/codex_input.txt
 5. Write /tmp/codex_review.py with:
-   - model: o4-mini
+   - model: gpt-5.6-sol
    - reasoning_effort: medium (or high for 1000+ lines)
    - max_completion_tokens: 16000 (or 32000 for large files)
    - developer prompt: code review expert, JSON-only response

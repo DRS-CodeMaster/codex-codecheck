@@ -63,7 +63,7 @@ Same format as /codex:review but with impact rating:
 
 ```
 ## Optimization: <filename>
-Model: gpt-5.3-codex | Reasoning: high
+Model: gpt-5.6-sol | Reasoning: high
 
 [CRITICAL] Line XX: Description (Impact: high)
   Fix: Suggestion

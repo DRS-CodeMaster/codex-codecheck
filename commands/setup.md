@@ -17,7 +17,12 @@ First-time setup for Codex-CodeCheck. Stores the user's OpenAI API key.
 ```json
 {
   "openai_api_key": "<USER_KEY>",
-  "model": "o4-mini",
+  "model": "gpt-5.6-sol",
+  "model_effort": "medium",
+  "multi_model": "gpt-5.6-sol",
+  "multi_effort": "high",
+  "mini_model": "gpt-5.6-sol",
+  "mini_effort": "low",
   "default_focus": "Security, Performance, Code Quality, Best Practices"
 }
 ```

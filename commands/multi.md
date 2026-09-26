@@ -32,7 +32,7 @@ Review multiple files together with cross-file dependency analysis.
    === FILE: path/to/file2.php ===
    <content>
 4. Write /tmp/codex_review.py with:
-   - model: gpt-5.3-codex
+   - model: gpt-5.6-sol
    - reasoning_effort: high (always for multi-file)
    - max_completion_tokens: 32000
    - developer prompt: cross-file review expert

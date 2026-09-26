@@ -1,17 +1,18 @@
 ---
 name: codex-codecheck
 description: >
-  AI-powered Code-Review mit OpenAI gpt-5.3-codex (Default) oder o4-mini (Mini-Files).
+  AI-powered Code-Review mit OpenAI gpt-5.6-sol (eine Modellwahl, drei Denkstufen).
   Sendet PHP/JS/JSON/PY-Dateien zur autonomen Analyse, praesentiert Findings im Chat.
   Trigger: "codex review", "codex pruefen", "codecheck", "/codex",
   "lass codex das pruefen", "review mit codex", "codex findings", "codex optimize".
 ---
 
-# Codex-CodeCheck Skill v6 (lokal + async polling)
+# Codex-CodeCheck Skill v7 (lokal + async polling + /v1/responses)
 
-Autonome Code-Review: Claude liest Dateien, schickt sie an OpenAI gpt-5.3-codex
-(oder o4-mini fuer Mini-Files), pollt im Hintergrund und praesentiert
-Findings synchron im Chat.
+Autonome Code-Review: Claude liest Dateien, schickt sie an OpenAI gpt-5.6-sol,
+pollt im Hintergrund und praesentiert Findings synchron im Chat. Die Denkstufe
+richtet sich nach dem Modus (mini low, multi high, sonst medium). Frueher stand hier
+explizite Mini-Reviews genutzt (User sagt "schnell"/"mini" UND < 300 Zeilen).
 
 ## 🚀 Quickstart — Wann nehme ich welchen Befehl?
 
@@ -26,6 +27,12 @@ Faustregel:
 └─ Erster Aufruf, keine Config vorhanden            → /codex:setup
 ```
 
+**Modell (wichtig):** Fuer ALLE Reviews laeuft **gpt-5.6-sol** ueber den
+`/v1/responses`-Endpoint. Unterschieden wird nur die Denkstufe: **medium** normal,
+**high** fuer Multi-File, **low** fuer Mini-Reviews (MODE=mini),
+d.h. wenn der User explizit "schnell"/"mini" sagt UND die Datei < 300 Zeilen hat.
+Multi/Security/Optimize laufen immer mit high.
+
 ### Entscheidungs-Baum
 
 1. **Config vorhanden?** (`~/.codex-codecheck/config.json`)
@@ -34,13 +41,14 @@ Faustregel:
 
 2. **Wie viele Dateien?**
    - 1 Datei → `/codex:review` oder Spezial (`/codex:security`, `/codex:optimize`).
-   - 2+ Dateien → `/codex:multi` (immer gpt-5.3-codex high).
+   - 2+ Dateien → `/codex:multi` (immer gpt-5.6-sol, Denkstufe high).
 
 3. **Hat der User einen Fokus genannt?**
    - "sicher?" / "injection" / "auth" / "login" → `/codex:security`.
    - "langsam" / "memory" / "n+1" / "optimieren" → `/codex:optimize`.
-   - "schnell" / "mini" UND < 300 Zeilen → `/codex:review` mit MODE=mini.
-   - Sonst → `/codex:review` Default (gpt-5.3-codex high).
+   - "schnell" / "mini" UND < 300 Zeilen → `/codex:review` mit MODE=mini
+     (Denkstufe low — nur hier!).
+   - Sonst → `/codex:review` Default (gpt-5.6-sol, Denkstufe medium).
 
 4. **Wo liegt die Datei?**
    - Lokal auf dem Mac (`/Users/...`, Projektpfad) → direkt per `cp` nach `input.txt`.
@@ -63,30 +71,42 @@ Claude (alles via Desktop Commander):
 
 ---
 
+## Wichtigste Aenderungen v6 → v7
+
+- **`/v1/responses`-Endpoint fuer codex-Familie:** gpt-5.6-sol (und jedes Modell
+  mit "codex" im Namen) laeuft jetzt ueber `https://api.openai.com/v1/responses`
+  mit `instructions`/`input`/`max_output_tokens`/`reasoning:{effort}` statt ueber
+  `chat/completions`. Antwort wird aus `output[].content[].output_text` extrahiert.
+  Aeltere Modelle nutzen weiter `chat/completions` (Legacy).
+- **Seit 2026-08-20 ein Modell fuer alles:** gpt-5.6-sol. Mini heisst nicht mehr
+  anderes Modell, sondern niedrigere Denkstufe (low, MODE=mini, < 300 Zeilen).
+- **Timeout 600s** im Runner (war 290s) — high-reasoning-Calls haben mehr Luft.
+
 ## Wichtigste Aenderungen v5 → v6
 
 - **Lokal arbeiten:** Alle File-Ops + Python-Calls laufen via Desktop Commander
   auf dem Mac (`mcp__Desktop_Commander__start_process`), NICHT im Sandbox-Bash.
   Grund: Sandbox `/tmp` und Mac `/tmp` sind getrennte Filesysteme — Config liegt
   auf Mac, Skript wuerde Config nicht finden.
-- **Async + Polling:** gpt-5.3-codex mit reasoning=high braucht 2-4 min. MCP-Calls
+- **Async + Polling:** gpt-5.6-sol mit reasoning=high braucht 2-4 min. MCP-Calls
   haben 60-120s Limit → Skript via `nohup ... &` starten, dann mit kurzen
   `read_process_output`-Polls (timeout_ms 1500-3000) auf Output-Datei warten.
-- **Default = gpt-5.3-codex:** o4-mini nur fuer kleine Files (< 300 Zeilen) ODER
+- **Ein Modell, drei Stufen:** low nur fuer kleine Files (< 300 Zeilen) ODER
   wenn User explizit "schnell"/"mini" sagt. Standard ist immer das volle Modell.
 - **Persistente Pfade:** Runner liegt unter `~/.codex-codecheck/runner.py`,
   nicht in `/tmp` (ueberlebt Reboots, weniger Setup-Cost).
 
 ## Modell-Auswahl
 
-| Bedingung | Modell | reasoning_effort | max_tokens | Erwartete Dauer |
-|-----------|--------|------------------|------------|-----------------|
-| Default (Review/Multi/Security/Optimize) | gpt-5.3-codex | high | 32000 | 2-4 min |
-| User sagt "schnell"/"mini" UND < 300 Zeilen | o4-mini | medium | 16000 | 30-60s |
-| Skill-Doku-Kurzcheck (eigene .md, < 200 Z.) | o4-mini | low | 8000 | 15-30s |
+| Bedingung | Modell | Endpoint | effort | max_tokens | Erwartete Dauer |
+|-----------|--------|----------|--------|------------|-----------------|
+| Review / Security / Optimize | gpt-5.6-sol | `/v1/responses` | medium | 32000 | 1-3 min |
+| Multi-File | gpt-5.6-sol | `/v1/responses` | high | 32000 | 2-4 min |
+| Mini: User sagt "schnell"/"mini" UND < 300 Zeilen | gpt-5.6-sol | `/v1/responses` | low | 16000 | 30-60s |
 
-**Niemals** o4-mini fuer Multi-File / Security / Optimize — User-Feedback:
-"wir nutzen den groessten 5.3-codex".
+**Grundregel:** gpt-5.6-sol ist das Modell fuer ALLES; gesteuert wird ueber die
+Denkstufe. **Niemals** low fuer Multi-File / Security / Optimize —
+User-Feedback: "wir nutzen den groessten 5.3-codex".
 
 ## Credentials
 
@@ -102,8 +122,12 @@ Format (v5.1+, Fallback-Array):
     {"key": "sk-proj-...", "label": "primary (credits)"},
     {"key": "sk-proj-...", "label": "fallback (paid)"}
   ],
-  "model": "gpt-5.3-codex",
-  "mini_model": "o4-mini"
+  "model": "gpt-5.6-sol",
+  "model_effort": "medium",
+  "multi_model": "gpt-5.6-sol",
+  "multi_effort": "high",
+  "mini_model": "gpt-5.6-sol",
+  "mini_effort": "low"
 }
 ```
 
@@ -195,33 +219,52 @@ collidieren nicht mit MCP-Limit.
 
 ## Runner-Script (~/.codex-codecheck/runner.py)
 
-Dieses Skript wird beim ersten Run deployt (Setup oder on-demand ersetzt):
+Dieses Skript wird beim ersten Run deployt (Setup oder on-demand ersetzt).
+**v7** waehlt den Endpoint automatisch je Modell: codex-Familie → `/v1/responses`,
+alles Aeltere → `/v1/chat/completions` (Legacy).
 
 ```python
 #!/usr/bin/env python3
-# ~/.codex-codecheck/runner.py (v6)
+# ~/.codex-codecheck/runner.py (v7 — gpt-5.6-sol via /v1/responses)
 import json, os, sys, urllib.request, urllib.error, time
 
-BASE = os.path.expanduser('~/.codex-codecheck')
-CFG  = json.load(open(f'{BASE}/config.json'))
-MODE = sys.argv[1] if len(sys.argv) > 1 else 'review'   # review|multi|security|optimize|mini
+BASE  = os.path.expanduser('~/.codex-codecheck')
+CFG   = json.load(open(f'{BASE}/config.json'))
+MODE  = sys.argv[1] if len(sys.argv) > 1 else 'review'
 FOCUS = sys.argv[2] if len(sys.argv) > 2 else 'Security, Performance, Code Quality'
 
-def set_status(s): open(f'{BASE}/status.txt', 'w').write(s)
+def set_status(s):
+    open(f'{BASE}/status.txt', 'w').write(s)
+
 set_status('running')
 
-# Key-Liste
+# Keys laden (multi-key fallback)
 if 'openai_api_keys' in CFG:
-    keys = [(e['key'], e.get('label','?')) if isinstance(e,dict) else (e,'?')
+    keys = [(e['key'], e.get('label','?')) if isinstance(e, dict) else (e, '?')
             for e in CFG['openai_api_keys']]
 else:
     keys = [(CFG['openai_api_key'], 'default')]
 
-# Modell + reasoning
+# Model + Effort + Token-Cap per Mode (Stand 2026-08-20)
+# Ein Modell fuer alles: gpt-5.6-sol. Der Unterschied liegt in der Denkstufe.
+#   mini  -> low     (schnell)
+#   multi -> high    (Cross-File braucht mehr)
+#   Rest  -> medium  (normal)
+# Die Stufen kommen aus der Config, damit ein Wechsel nicht im Code stattfindet.
+# ACHTUNG: gpt-5.6-sol nimmt none|low|medium|high|xhigh — 'minimal', 'fast' und
+# 'normal' werden von der API abgelehnt (live geprueft am 2026-08-20).
 if MODE == 'mini':
-    model, effort, max_tok = 'o4-mini', 'medium', 16000
+    model  = CFG.get('mini_model', 'gpt-5.6-sol')
+    effort = CFG.get('mini_effort', 'low')
+    max_tok = 16000
+elif MODE == 'multi':
+    model  = CFG.get('multi_model', 'gpt-5.6-sol')
+    effort = CFG.get('multi_effort', 'high')
+    max_tok = 32000
 else:
-    model, effort, max_tok = CFG.get('model','gpt-5.3-codex'), 'high', 32000
+    model  = CFG.get('model', 'gpt-5.6-sol')
+    effort = CFG.get('model_effort', 'medium')
+    max_tok = 32000
 
 code = open(f'{BASE}/input.txt').read()
 
@@ -238,28 +281,68 @@ json_spec = (' Antworte NUR mit validem JSON (kein Markdown/Backticks): '
              '"beschreibung":"...","fix_vorschlag":"..."}],'
              '"fazit":"...","top3":["...","...","..."]}')
 
-body = json.dumps({
-    'model': model,
-    'max_completion_tokens': max_tok,
-    'reasoning_effort': effort,
-    'messages': [
-        {'role':'developer','content': base_dev + json_spec},
-        {'role':'user','content': f'Fokus: {FOCUS}\n\nCode:\n{code}'}
-    ]
-}).encode()
+# === Endpoint-Wahl je nach Modell ===
+# codex-Familie UND die gpt-5.x-Generation (gpt-5.6-sol, -luna, -terra) -> /v1/responses
+# alles Aeltere -> /v1/chat/completions (Legacy)
+# WICHTIG: der frühere Test 'codex' in model war zu eng — gpt-5.6-sol traegt das Wort
+# nicht im Namen und waere faelschlich auf chat/completions gelandet, wo
+# reasoning:{effort} nicht existiert (geprueft am 2026-08-20).
+is_responses_model = any(x in model.lower() for x in ('codex', 'gpt-5.'))
+
+if is_responses_model:
+    body_obj = {
+        'model': model,
+        'instructions': base_dev + json_spec,
+        'input': f'Fokus: {FOCUS}\n\nCode:\n{code}',
+        'max_output_tokens': max_tok,
+        'reasoning': {'effort': effort},
+    }
+    endpoint = 'https://api.openai.com/v1/responses'
+else:
+    body_obj = {
+        'model': model,
+        'max_completion_tokens': max_tok,
+        'reasoning_effort': effort,
+        'messages': [
+            {'role':'developer','content': base_dev + json_spec},
+            {'role':'user','content': f'Fokus: {FOCUS}\n\nCode:\n{code}'}
+        ]
+    }
+    endpoint = 'https://api.openai.com/v1/chat/completions'
+
+body = json.dumps(body_obj).encode()
+
+def extract_text(data, codex_family):
+    """Extrahiert den Antworttext aus beiden Endpoint-Formaten."""
+    if codex_family:
+        text = ''
+        for item in data.get('output', []):
+            if item.get('type') == 'message':
+                for c in item.get('content', []):
+                    if c.get('type') == 'output_text':
+                        text += c.get('text', '')
+        return text
+    else:
+        return data['choices'][0]['message']['content']
 
 QUOTA = ('insufficient_quota','billing_hard_limit_reached','exceeded_quota','quota_exceeded')
 last_err = None
+
 for key, label in keys:
     req = urllib.request.Request(
-        'https://api.openai.com/v1/chat/completions', data=body,
+        endpoint, data=body,
         headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'})
     try:
         t0 = time.time()
-        resp = urllib.request.urlopen(req, timeout=290)
+        resp = urllib.request.urlopen(req, timeout=600)
         data = json.loads(resp.read())
-        sys.stderr.write(f'[codex] {label} ok in {time.time()-t0:.1f}s\n')
-        open(f'{BASE}/out.json','w').write(data['choices'][0]['message']['content'])
+        text = extract_text(data, is_codex_family)
+        if not text:
+            last_err = f'{label}: empty response (model={model})'
+            sys.stderr.write(f'[codex] {last_err}\n')
+            continue
+        sys.stderr.write(f'[codex] {label} ok in {time.time()-t0:.1f}s | model={model} | effort={effort} | endpoint={"responses" if is_codex_family else "chat"}\n')
+        open(f'{BASE}/out.json','w').write(text)
         set_status('done')
         sys.exit(0)
     except urllib.error.HTTPError as e:
@@ -274,7 +357,7 @@ for key, label in keys:
         sys.stderr.write(f'[codex] {label} err -> next: {e}\n'); continue
 
 open(f'{BASE}/out.json','w').write(json.dumps({'error': f'all keys failed: {last_err}'}))
-set_status(f'error: all keys failed')
+set_status('error: all keys failed')
 sys.exit(1)
 ```
 
@@ -282,7 +365,7 @@ sys.exit(1)
 
 ### /codex:review <datei> [fokus]
 
-Einzeldatei-Review (Default: gpt-5.3-codex high).
+Einzeldatei-Review (Default: gpt-5.6-sol high).
 
 ```
 1. mcp__Desktop_Commander__start_process(
@@ -312,7 +395,7 @@ Einzeldatei-Review (Default: gpt-5.3-codex high).
 
 ### /codex:multi <datei1> <datei2> ... [fokus]
 
-Multi-File. Immer gpt-5.3-codex high. Schritt 3 ersetzt durch:
+Multi-File. Immer gpt-5.6-sol high. Schritt 3 ersetzt durch:
 
 ```
 mcp__Desktop_Commander__start_process(
@@ -341,8 +424,8 @@ Wie /codex:review, aber Schritt 5 mit `runner.py optimize '<zusatz>'`.
      "mkdir -p ~/.codex-codecheck && cat > ~/.codex-codecheck/config.json << 'EOF'
 {
   \"openai_api_keys\": [{\"key\": \"<KEY>\", \"label\": \"primary\"}],
-  \"model\": \"gpt-5.3-codex\",
-  \"mini_model\": \"o4-mini\"
+  \"model\": \"gpt-5.6-sol\",
+  \"mini_model\": \"gpt-5.6-sol\"
 }
 EOF
 chmod 600 ~/.codex-codecheck/config.json && echo OK",
@@ -372,7 +455,7 @@ Pro Poll genau 1 short cat + 1 sleep 10 = 2 MCP-Calls / 10s.
 
 ```
 ## CodeCheck: <dateiname> (<zeilen> Zeilen)
-Modell: gpt-5.3-codex | Reasoning: high | Fokus: <fokus> | Dauer: 2m43s
+Modell: gpt-5.6-sol | Endpoint: responses | Reasoning: high | Fokus: <fokus> | Dauer: 2m43s
 
 [CRITICAL] Zeile XX: Beschreibung
   Fix: Konkreter Vorschlag
@@ -397,19 +480,29 @@ Top-3 Massnahmen:
 2. Config pruefen vor jedem Run — fehlt sie, /codex:setup anbieten
 3. **ALLES via Desktop Commander auf dem Mac** — kein Sandbox-Bash fuer
    File-Ops oder Python-Calls (Sandbox /tmp != Mac /tmp)
-4. Async-Pattern fuer alle Calls > 60s (= alle gpt-5.3-codex-Calls!)
+4. Async-Pattern fuer alle Calls > 60s (= alle gpt-5.6-sol-Calls!)
 5. Dateiinhalt immer ueber `~/.codex-codecheck/input.txt` — nie inline im
    Python-String (Quoting-Hell, Tokens verschwendet)
-6. Default-Modell ist gpt-5.3-codex (volles Modell). o4-mini nur wenn User
+6. Modell ist immer gpt-5.6-sol. Denkstufe low nur wenn User
    "schnell"/"mini" sagt UND File < 300 Zeilen
 7. Polling: max 30 Iterationen a 10s = 5 min Timeout. Danach: User fragen
    ob er warten will (`tail ~/.codex-codecheck/last.log` checken).
 8. Bei Quota-Error (HTTP 402/429): Runner faellt automatisch auf naechsten
    Key zurueck. Im Chat erwaehnen: "Fallback-Key (label: paid) verwendet."
 
+## Migrations-Hinweise v6 → v7
+
+- `runner.py` neu deployen (v7) — wer noch den v6-Runner (`chat/completions` fuer
+  alle Modelle) hat, bekommt bei gpt-5.6-sol evtl. leere/fehlerhafte Antworten.
+  v7 routet codex-Modelle korrekt auf `/v1/responses`.
+- Keine Config-Aenderung noetig: `model`/`mini_model`-Felder bleiben gleich.
+- `out.json`-Format unveraendert (gleiches JSON-Schema) — Praesentation kompatibel.
+
 ## Migrations-Hinweise v5 → v6
 
 - Alte Skripte unter `/tmp/codex_*.py` koennen geloescht werden
-- `model: o4-mini` Default in alten configs → manuell auf `gpt-5.3-codex` umstellen
+- `model: gpt-5.6-sol` oder `gpt-5.6-sol` in alten configs → auf `gpt-5.6-sol` umstellen
   (oder beim naechsten Setup ueberschreiben lassen)
-- Neue Pflicht-Felder: `mini_model` (default "o4-mini")
+- Felder seit 2026-08-20: `model`/`multi_model`/`mini_model` (alle `gpt-5.6-sol`) plus
+  `model_effort` medium, `multi_effort` high, `mini_effort` low.
+  gpt-5.6-sol ist raus — OpenAI schaltet es am 23.10.2026 ab.
