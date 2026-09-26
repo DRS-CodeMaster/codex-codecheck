@@ -1,68 +1,64 @@
 # Codex-CodeCheck
 
-**Free & open source** — no subscription required. Uses your own OpenAI API key. Typical cost: **$0.01–0.03 per review**.
+**A second opinion from OpenAI Codex, right inside Claude.** Free & open source.
 
-AI-powered code review plugin that combines Claude's orchestration with OpenAI gpt-5.6-sol's deep reasoning. Two AI powerhouses reviewing your code together.
+Claude writes the task, OpenAI Codex (default model **gpt-5.6-sol**) reviews your code as an
+independent agent — it reads the files itself in a read-only sandbox — and Claude presents
+structured findings with severity, line numbers and fix suggestions.
 
-## What it does
+## Two ways to reach Codex
 
-Codex-CodeCheck analyzes your source code for security vulnerabilities, performance bottlenecks, and code quality issues. Claude reads and understands your codebase, then sends it to OpenAI's gpt-5.6-sol model for an independent, autonomous analysis. Results are returned as structured findings with severity ratings and fix suggestions — directly in your chat.
+| | ChatGPT account | OpenAI API key |
+|---|---|---|
+| Who | ChatGPT Plus, Pro, Business … | anyone with an OpenAI API account |
+| Cost | included in your plan's Codex quota | pay per token (typically cents per review) |
+| Setup | `codex login` (browser) | key stored locally in `~/.codex-codecheck/config.json` |
+
+The plugin always tries your **ChatGPT account first**. Your API key is used only when there is
+no ChatGPT login or the plan's limit is reached — and every result tells you which route was used.
+Configure both and you never get stuck.
 
 ## Commands
 
 | Command | Description |
-|---------|-------------|
-| `/codex:setup` | Configure your OpenAI API key (first-time setup) |
-| `/codex:review <file>` | General code review (security + performance + quality) |
-| `/codex:multi <file1> <file2> ...` | Cross-file review with dependency analysis |
-| `/codex:security <file>` | Dedicated security audit with CWE references |
-| `/codex:optimize <file>` | Dedicated performance optimization analysis |
+|---|---|
+| `/codex:setup` | Install check, link the runtime, choose ChatGPT account and/or API key |
+| `/codex:review <file>` | General review (use "quick" for small files) |
+| `/codex:multi <file1> <file2> …` | Cross-file review |
+| `/codex:security <file>` | Security audit with CWE references |
+| `/codex:optimize <file>` | Performance analysis with impact rating |
+| `/codex:consult <question> [files]` | Let Codex cross-check a plan or decision |
 
-## Quick Start
+## Quick start
 
 1. Install the plugin
-2. Run `/codex:setup` and enter your OpenAI API key
-3. Run `/codex:review path/to/your/file.php`
+2. Run `/codex:setup`
+3. Run `/codex:review path/to/file.php`
 
 ## Requirements
 
-- OpenAI API key with access to gpt-5.6-sol model
-- Python 3 installed on your machine
+- [Codex CLI](https://github.com/openai/codex) (`npm install -g @openai/codex`, tested with 0.155)
+- A ChatGPT account with Codex access **or** an OpenAI API key
+- Python 3 and bash (macOS, Linux, WSL)
 
-## Supported Languages
+## Reasoning effort by mode
 
-PHP, JavaScript, TypeScript, Python, HTML, CSS, JSON, XML, SQL, Markdown, YAML, Go, Rust, Java, C#, and more.
+| Mode | Reasoning | Typical time |
+|---|---|---|
+| mini (quick review, < 300 lines) | low | ~15 s |
+| review, consult | medium | 1–3 min |
+| multi, security, optimize | high | 2–4 min |
 
-## Smart Mode Selection
-
-The plugin automatically adjusts its analysis depth:
-
-| Condition | Reasoning Effort | Notes |
-|-----------|-----------------|-------|
-| Small file (<1000 lines) | medium | Fast, cost-efficient |
-| Large file (1000+ lines) | high | Deep analysis |
-| Multiple files | high | Cross-file references |
-| Security audit | high | Always thorough |
-| Optimization audit | high | Always thorough |
-
-## Cost
-
-**This plugin is 100% free.** No subscription, no hidden fees, no premium tier.
-
-You only pay OpenAI directly for API usage (bring your own key). Typical costs:
-- Small file (medium reasoning): ~$0.01-0.03
-- Large file (high reasoning): ~$0.05-0.15
-- Multi-file review: ~$0.10-0.30
-
-That's cents, not dollars. A full month of daily reviews typically costs less than a coffee.
+Change the model with `"model"` in `~/.codex-codecheck/config.json` or per run with
+`CODEX_CODECHECK_MODEL`.
 
 ## Privacy
 
-- Your code is sent to OpenAI's API for analysis
-- Your API key is stored locally on your machine only
-- No data is stored on any server
-- No telemetry or tracking
+- Your code is processed by OpenAI, under your ChatGPT or API account's terms
+- Codex runs in a read-only sandbox and never modifies files
+- API keys stay in a local file (mode 600) and are passed only to the single Codex process
+- The plugin itself stores nothing on any server — no telemetry, no tracking
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE)

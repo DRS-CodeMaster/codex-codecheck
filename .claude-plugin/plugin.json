@@ -1,7 +1,7 @@
 {
   "name": "codex-codecheck",
-  "version": "2.3.0",
-  "description": "Free & open source AI code review — no subscription required. Combines Claude with OpenAI gpt-5.6-sol for deep reasoning analysis. Security audits, performance optimization, cross-file analysis. Typical cost: $0.01-0.03 per review (your own API key).",
+  "version": "3.0.0",
+  "description": "Second opinion from OpenAI Codex (gpt-5.6-sol) inside Claude: code reviews, security audits, performance analysis and plan cross-checks. Runs on your ChatGPT account (no API cost) with your own OpenAI API key as optional fallback.",
   "author": "DRS-CodeMaster",
   "homepage": "https://github.com/DRS-CodeMaster/codex-codecheck",
   "tags": [
@@ -9,6 +9,7 @@
     "security",
     "performance",
     "openai",
+    "codex",
     "gpt-5.6-sol"
   ],
   "skills": [
@@ -19,6 +20,7 @@
     "commands/multi.md",
     "commands/security.md",
     "commands/optimize.md",
+    "commands/consult.md",
     "commands/setup.md"
   ]
 }
