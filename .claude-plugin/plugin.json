@@ -1,7 +1,7 @@
 {
   "name": "codex-codecheck",
-  "version": "3.0.0",
-  "description": "Second opinion from OpenAI Codex (gpt-5.6-sol) inside Claude: code reviews, security audits, performance analysis and plan cross-checks. Runs on your ChatGPT account (no API cost) with your own OpenAI API key as optional fallback.",
+  "version": "3.0.1",
+  "description": "Second opinion from OpenAI Codex (gpt-5.6-sol) inside Claude: code reviews, security audits, performance analysis and plan cross-checks. Runs on your ChatGPT account (no API cost) with your own OpenAI API key as optional fallback. Requires local shell access (Claude Code, or Claude Desktop with Desktop Commander).",
   "author": "DRS-CodeMaster",
   "homepage": "https://github.com/DRS-CodeMaster/codex-codecheck",
   "tags": [

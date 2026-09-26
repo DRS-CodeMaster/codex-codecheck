@@ -10,6 +10,15 @@ First-time setup for Codex-CodeCheck. Safe to run again at any time.
 
 ## Steps
 
+0. **Local shell access.** This plugin must run commands on the user's own computer. Check
+   which tool you have: Claude Code's Bash tool, or a local shell connector in Claude Desktop
+   such as Desktop Commander. Confirm it is really the user's machine, not a cloud sandbox:
+   `echo $HOME; uname -s; test -d ~/.codex && echo codex-home-found`.
+   If there is no local shell tool (e.g. claude.ai in the browser only) → **stop** and tell the user:
+   *"Codex-CodeCheck needs local shell access. Use Claude Code, or install Desktop Commander in
+   the Claude Desktop app: `npx @wonderwhy-er/desktop-commander@latest setup`, then restart
+   Claude Desktop — https://github.com/wonderwhy-er/DesktopCommanderMCP"*
+
 1. **Codex CLI.** Check `command -v codex && codex --version`. If missing, ask the user, then
    install: `npm install -g @openai/codex` (needs Node.js 18+).
 

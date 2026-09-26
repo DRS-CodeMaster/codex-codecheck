@@ -6,6 +6,16 @@ Claude writes the task, OpenAI Codex (default model **gpt-5.6-sol**) reviews you
 independent agent — it reads the files itself in a read-only sandbox — and Claude presents
 structured findings with severity, line numbers and fix suggestions.
 
+> **Requirement: local shell access.** Codex runs on *your* computer, so Claude needs a tool
+> that can execute terminal commands there:
+> - **Claude Code** (terminal, desktop app, IDE) — built in, nothing to add
+> - **Claude Desktop app** — add a local shell connector such as
+>   [Desktop Commander](https://github.com/wonderwhy-er/DesktopCommanderMCP)
+>   (`npx @wonderwhy-er/desktop-commander@latest setup`, then restart Claude Desktop)
+>
+> It does **not** work in claude.ai in the browser alone: code there runs in a cloud sandbox
+> that cannot reach your machine, your Codex CLI or your ChatGPT login.
+
 ## Two ways to reach Codex
 
 | | ChatGPT account | OpenAI API key |
@@ -37,6 +47,8 @@ Configure both and you never get stuck.
 
 ## Requirements
 
+- **Local shell access for Claude:** Claude Code, or Claude Desktop with a local shell connector
+  such as [Desktop Commander](https://github.com/wonderwhy-er/DesktopCommanderMCP)
 - [Codex CLI](https://github.com/openai/codex) (`npm install -g @openai/codex`, tested with 0.155)
 - A ChatGPT account with Codex access **or** an OpenAI API key
 - Python 3 and bash (macOS, Linux, WSL)

@@ -15,6 +15,17 @@ Codex runs as its own agent: it **reads the files itself** inside a read-only sa
 Claude pasting code into a prompt. Claude writes the task, starts the run, waits, verifies and
 presents. Codex never changes anything.
 
+## Requirement: local shell access
+
+Everything runs on the user's own computer. Claude needs a tool that executes local shell
+commands — **Claude Code's Bash tool**, or in the Claude Desktop app a local shell connector such
+as **Desktop Commander** (`start_process` / `read_process_output`). Use whichever is available.
+
+If the only way to run code is a cloud sandbox (e.g. claude.ai in the browser, no local
+connector): **stop** and tell the user this plugin needs local shell access — Claude Code, or
+Claude Desktop with Desktop Commander (`npx @wonderwhy-er/desktop-commander@latest setup`).
+Never try to install or run Codex inside a cloud sandbox.
+
 ## Two ways to reach Codex
 
 | Order | Route | Cost | Set up with |
@@ -77,8 +88,14 @@ permanently with `"model"` in `config.json`.
    Never put credentials or personal data into the prompt.
 3. **Run** from the directory that contains the files (or a common parent):
    `~/.codex-codecheck/codex-run.sh <mode> <workdir>`
-   Runs longer than ~1 minute go in the background (e.g. Bash `run_in_background`); poll
-   `status.txt`. While waiting, give the user a short status update about every 3 minutes.
+   Runs longer than ~1 minute go in the background — Bash `run_in_background`, Desktop
+   Commander `start_process`, or detached with any shell tool:
+   ```bash
+   rm -f ~/.codex-codecheck/status.txt   # never read a stale result from a previous run
+   nohup ~/.codex-codecheck/codex-run.sh <mode> <workdir> >/dev/null 2>&1 &
+   ```
+   Then poll `cat ~/.codex-codecheck/status.txt 2>/dev/null` until it says `done` or starts
+   with `error:` (missing file or `running` = still working). While waiting, give the user a short status update about every 3 minutes.
 4. **Result:** check `status.txt` and `route.txt`, then read `out.json`. On `error:` show the
    last lines of `last.log`. If the route was `api:*`, tell the user explicitly, including the
    reason from `last.log` ("ChatGPT account unavailable (…)").
